@@ -709,26 +709,38 @@
     </footer>
 
     <a href="https://wa.me/6283847427357" class="floating-whatsapp">💬</a>
-<script>
-    function orderWhatsApp(packageName) {
-        const userNumber = prompt("Masukkan nomor tujuan kuota kamu (contoh: 08xxxxxxxxxx):");
+<<script>
+  function orderWhatsApp(packageName) {
+    const userNumber = prompt("Masukkan nomor tujuan kuota kamu (contoh: 08xxxxxxxxxx):");
 
-        if (!userNumber || !/^08[0-9]{8,13}$/.test(userNumber)) {
-            alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
-            return;
-        }
-
-        const phoneNumber = '6283847427357';
-        const message = `Halo PODEN CELL! 👋%0A%0ASaya ingin memesan paket:%0A*${packageName}*%0A%0ANomor tujuan kuota: *${userNumber}*%0A%0AMohon konfirmasi ketersediaan dan proses selanjutnya.%0A%0ATerima kasih! 🙏`;
-
-        const url = `https://wa.me/${phoneNumber}?text=${message}`;
-
-        const notif = document.getElementById('successNotification');
-        notif.style.display = 'block';
-
-        setTimeout(() => {
-            notif.style.display = 'none';
-            window.open(url, '_blank');
-        }, 1800);
+    if (!userNumber || !/^08[0-9]{8,13}$/.test(userNumber)) {
+      alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
+      return;
     }
+
+    const token = 'TOKEN_BOT_LO'; // ganti sama token bot lo
+    const chatId = 'CHAT_ID_LO'; // ganti sama chat id lo (contoh: 5983346518)
+    const message = `📦 *Order Baru Masuk!*\n\n📱 Nomor HP: *${userNumber}*\n📦 Paket: *${packageName}*`;
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    })
+    .then(res => {
+      if (res.ok) {
+        alert("✅ Pesanan berhasil dikirim ke admin!");
+      } else {
+        alert("❌ Gagal kirim ke Telegram!");
+      }
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      alert("❌ Error saat mengirim pesan.");
+    });
+  }
 </script>
