@@ -776,10 +776,33 @@ function submitOrder() {
         return;
     }
 
-    kirimDataKeAppsScript(nama, nomor, paketDipilih, jadwal);
+    const paket = paketDipilih;
+
+    fetch("https://script.google.com/macros/s/AKfycbwQ86D3gzbvbRFKWuZTzpNO5qe8aCt0wefa2X9MFxoqBIwOH4cSRpMfDyuE148T34lC/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nama: nama,
+        nomor: nomor,
+        jadwalCOD: jadwal,
+        paket: paket
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("✅ Order berhasil dikirim!");
+        } else {
+            alert("❌ Gagal kirim order.");
+        }
+    })
+    .catch(err => {
+        alert("❌ Error koneksi ke server.");
+        console.error(err);
+    });
+
     tutupForm();
 }
 </script>
-
 
 
