@@ -656,6 +656,13 @@
             </div>
         </div>
     </section>
+<div id="popupForm" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
+  <h3>Masukkan Nomor HP</h3>
+  <input type="text" id="userNumber" placeholder="08xxxxxxxxxx" style="width:100%; padding:10px; margin:10px 0;">
+  <button onclick="submitOrder()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
+  <button onclick="tutupForm()" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+</div>
+
 
     <section class="payment-methods">
         <div class="container">
@@ -736,17 +743,28 @@ function kirimTelegram(nama, nomor, paket, jadwalCOD) {
 }
 </script>
 
-    <script>
-  function bukaForm(paket) {
-    const selectPaket = document.querySelector('select[name="paket"]');
-    selectPaket.value = paket;
+  <script>
+  let paketDipilih = '';
 
-    const form = document.querySelector('.order-form');
-    if (form) {
-      form.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      alert("Form tidak ditemukan!");
+  function bukaForm(namaPaket) {
+    paketDipilih = namaPaket;
+    document.getElementById('popupForm').style.display = 'block';
+  }
+
+  function tutupForm() {
+    document.getElementById('popupForm').style.display = 'none';
+  }
+
+  function submitOrder() {
+    const nomor = document.getElementById('userNumber').value;
+    if (!/^08[0-9]{8,13}$/.test(nomor)) {
+      alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
+      return;
     }
+
+    // Kirim ke Telegram
+    kirimTelegram('-', nomor, paketDipilih, '-');
+    tutupForm();
   }
 </script>
 
