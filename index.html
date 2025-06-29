@@ -709,38 +709,29 @@
     </footer>
 
     <a href="https://wa.me/6283847427357" class="floating-whatsapp">💬</a>
-<<script>
-  function orderWhatsApp(packageName) {
-    const userNumber = prompt("Masukkan nomor tujuan kuota kamu (contoh: 08xxxxxxxxxx):");
+<script>
+function kirimTelegram(nama, nomor, paket, jadwalCOD) {
+    const url = 'https://script.google.com/macros/s/AKfycbzMNPVfV_rI1RanMxRKv75q_W3Taac3ufjPn9nX3C0YewjL9ZGLOG5u1nVy2juj_4yY/exec'; // URL dari Apps Script lo
 
-    if (!userNumber || !/^08[0-9]{8,13}$/.test(userNumber)) {
-      alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
-      return;
-    }
+    const data = {
+        nama,
+        nomor,
+        paket,
+        jadwal: jadwalCOD
+    };
 
-    const token = '7513695560:AAFxtPGtafOO42Vj9Ytrr1dJ6wEnhAMtACY'; // ganti sama token bot lo
-    const chatId = '5983346518'; // ganti sama chat id lo (contoh: 5983346518)
-    const message = `📦 *Order Baru Masuk!*\n\n📱 Nomor HP: *${userNumber}*\n📦 Paket: *${packageName}*`;
-
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'Markdown'
-      })
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
     })
-    .then(res => {
-      if (res.ok) {
+    .then(res => res.text())
+    .then(text => {
         alert("✅ Pesanan berhasil dikirim ke admin!");
-      } else {
-        alert("❌ Gagal kirim ke Telegram!");
-      }
     })
     .catch(err => {
-      console.error('Error:', err);
-      alert("❌ Error saat mengirim pesan.");
+        alert("❌ Gagal mengirim ke Telegram.");
+        console.error(err);
     });
-  }
+}
 </script>
