@@ -757,12 +757,13 @@ function kirimTelegram(nama, nomor, paket, jadwalCOD) {
             .replace(/!/g, "\\!");
     };
 
-    const pesan = 
-`📦 *Order Baru Masuk\\!* 
-👤 Nama: ${escape(nama)} 
-📱 Nomor: ${escape(nomor)} 
-📦 Paket: ${escape(paket)} 
-🚚 COD: ${escape(jadwalCOD)}`;
+  const pesan = 
+`📦 *Order Baru Masuk\\!*\\n` +
+`👤 Nama: ${escape(nama)}\\n` +
+`📱 Nomor: ${escape(nomor)}\\n` +
+`📦 Paket: ${escape(paket)}\\n` +
+`🚚 COD: ${escape(jadwalCOD)}`;
+
 
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
 
