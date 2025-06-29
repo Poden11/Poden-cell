@@ -731,67 +731,35 @@ function tutupForm() {
     document.getElementById('popupForm').style.display = 'none';
 }
 
-function kirimTelegram(nama, nomor, paket, jadwalCOD) {
-    const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek"; // Ganti token bot lo
-    const chat_id = "5983346518"; // Ganti ID Telegram lo
+function kirimDataKeAppsScript(nama, nomor, paket, jadwalCOD) {
+  const url = "https://script.google.com/macros/s/AKfycbwbp-vMg0H30DkoZnRsJ_PuC-q_uXy0jv5OilvPfdGWUB-BbKlkMXv4eh6KFpjmMbz1SQ/exec"; // link Web App lo
 
-    const escape = (text) => {
-        return text
-            .toString()
-            .replace(/_/g, "\\_")
-            .replace(/\*/g, "\\*")
-            .replace(/\[/g, "\\[")
-            .replace(/`/g, "\\`")
-            .replace(/~/g, "\\~")
-            .replace(/\(/g, "\\(")
-            .replace(/\)/g, "\\)")
-            .replace(/>/g, "\\>")
-            .replace(/#/g, "\\#")
-            .replace(/\+/g, "\\+")
-            .replace(/-/g, "\\-")
-            .replace(/=/g, "\\=")
-            .replace(/\|/g, "\\|")
-            .replace(/{/g, "\\{")
-            .replace(/}/g, "\\}")
-            .replace(/\./g, "\\.")
-            .replace(/!/g, "\\!");
-    };
-
-  const pesan = 
-`📦 *Order Baru Masuk\\!*\\n` +
-`👤 Nama: ${escape(nama)}\\n` +
-`📱 Nomor: ${escape(nomor)}\\n` +
-`📦 Paket: ${escape(paket)}\\n` +
-`🚚 COD: ${escape(jadwalCOD)}`;
-
-
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            chat_id: chat_id,
-            text: pesan,
-            parse_mode: "MarkdownV2"
-        })
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nama: nama,
+      nomor: nomor,
+      jadwalCOD: jadwalCOD,
+      paket: paket
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.ok) {
-            alert("✅ Order berhasil dikirim ke Telegram!");
-        } else {
-            alert("❌ Gagal: " + data.description);
-            console.log(data);
-        }
-    })
-    .catch(err => {
-        alert("❌ Gagal kirim, cek koneksi/format");
-        console.error(err);
-    });
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert("✅ Order berhasil dikirim!");
+    } else {
+      alert("❌ Gagal kirim order.");
+    }
+  })
+  .catch(err => {
+    alert("❌ Error koneksi ke server.");
+    console.error(err);
+  });
 }
+
 
 function submitOrder() {
     const nama = document.getElementById('userName').value;
@@ -808,7 +776,7 @@ function submitOrder() {
         return;
     }
 
-    kirimTelegram(nama, nomor, paketDipilih, jadwal);
+    kirimDataKeAppsScript(nama, nomor, paketDipilih, jadwal);
     tutupForm();
 }
 </script>
