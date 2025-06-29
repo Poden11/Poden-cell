@@ -666,6 +666,14 @@
   <button onclick="tutupForm()" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
 </div>
 
+    <form id="orderForm" action="https://script.google.com/macros/s/AKfycbwQ86D3gzbvbRFKWuZTzpNO5qe8aCt0wefa2X9MFxoqBIwOH4cSRpMfDyuE148T34lC/exec" method="POST" style="display:none;">
+  <input type="hidden" name="nama" id="formNama">
+  <input type="hidden" name="nomor" id="formNomor">
+  <input type="hidden" name="paket" id="formPaket">
+  <input type="hidden" name="jadwalCOD" id="formJadwal">
+</form>
+
+
 
     <section class="payment-methods">
         <div class="container">
@@ -731,35 +739,29 @@ function tutupForm() {
     document.getElementById('popupForm').style.display = 'none';
 }
 
-function kirimDataKeAppsScript(nama, nomor, paket, jadwalCOD) {
-  const url = "https://script.google.com/macros/s/AKfycbwbp-vMg0H30DkoZnRsJ_PuC-q_uXy0jv5OilvPfdGWUB-BbKlkMXv4eh6KFpjmMbz1SQ/exec"; // link Web App lo
+// (opsional) kalau masih mau kirim ke Telegram juga:
+function kirimTelegram(nama, nomor, paket, jadwalCOD) {
+  const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek"; // token bot lo
+  const chat_id = "5983346518";
+  const message = 
+`📦 *Order Baru Masuk!*\n👤 Nama: ${nama}\n📱 Nomor: ${nomor}\n📦 Paket: ${paket}\n🚚 COD: ${jadwalCOD}`;
 
-  fetch(url, {
+  const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+
+  fetch(telegramUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      nama: nama,
-      nomor: nomor,
-      jadwalCOD: jadwalCOD,
-      paket: paket
+      chat_id: chat_id,
+      text: message,
+      parse_mode: "Markdown"
     })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "success") {
-      alert("✅ Order berhasil dikirim!");
-    } else {
-      alert("❌ Gagal kirim order.");
-    }
-  })
-  .catch(err => {
-    alert("❌ Error koneksi ke server.");
-    console.error(err);
+  }).catch(err => {
+    console.error("Telegram error:", err);
   });
 }
-
 
 function submitOrder() {
     const nama = document.getElementById('userName').value;
@@ -776,31 +778,19 @@ function submitOrder() {
         return;
     }
 
-    const paket = paketDipilih;
+    // isi form tersembunyi
+    document.getElementById("formNama").value = nama;
+    document.getElementById("formNomor").value = nomor;
+    document.getElementById("formPaket").value = paketDipilih;
+    document.getElementById("formJadwal").value = jadwal;
 
-    fetch("https://script.google.com/macros/s/AKfycbwQ86D3gzbvbRFKWuZTzpNO5qe8aCt0wefa2X9MFxoqBIwOH4cSRpMfDyuE148T34lC/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nama: nama,
-        nomor: nomor,
-        jadwalCOD: jadwal,
-        paket: paket
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "success") {
-            alert("✅ Order berhasil dikirim!");
-        } else {
-            alert("❌ Gagal kirim order.");
-        }
-    })
-    .catch(err => {
-        alert("❌ Error koneksi ke server.");
-        console.error(err);
-    });
+    // kirim ke Google Apps Script
+    document.getElementById("orderForm").submit();
 
+    // (opsional) kirim juga ke Telegram
+    kirimTelegram(nama, nomor, paketDipilih, jadwal);
+
+    // tutup form popup
     tutupForm();
 }
 </script>
