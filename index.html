@@ -661,6 +661,9 @@
 <input type="text" id="userName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
 <input type="text" id="jadwalCOD" placeholder="Misal: Hari ini jam 5 sore" style="width:100%; padding:10px; margin:10px 0;">
 
+<input type="text" id="honeytrap" name="honeytrap" style="display:none;">
+
+
   <input type="text" id="userNumber" placeholder="08xxxxxxxxxx" style="width:100%; padding:10px; margin:10px 0;">
   <button onclick="submitOrder()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
   <button onclick="tutupForm()" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
@@ -671,6 +674,10 @@
   <input type="hidden" name="nomor" id="formNomor">
   <input type="hidden" name="paket" id="formPaket">
   <input type="hidden" name="jadwalCOD" id="formJadwal">
+
+<input type="hidden" name="token" id="formToken">
+
+
 </form>
 
 
@@ -812,6 +819,8 @@ function submitOrder() {
     document.getElementById("formNomor").value = nomor;
     document.getElementById("formPaket").value = paketDipilih;
     document.getElementById("formJadwal").value = jadwal;
+    document.getElementById("formToken").value = "iqbal_utari";
+
 
     // Submit form
     document.getElementById("orderForm").submit();
@@ -823,6 +832,3 @@ function submitOrder() {
     tutupForm();
 }
 </script>
-
-
-
