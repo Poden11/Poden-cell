@@ -746,9 +746,8 @@ function tutupForm() {
     document.getElementById('popupForm').style.display = 'none';
 }
 
-// Kirim ke Telegram (opsional)
 function kirimTelegram(nama, nomor, paket, jadwalCOD) {
-    const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek"; // ganti sama token bot lo
+    const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek";
     const chat_id = "5983346518";
     const message = 
 `📦 *Order Baru Masuk!*\n👤 Nama: ${nama}\n📱 Nomor: ${nomor}\n📦 Paket: ${paket}\n🚚 COD: ${jadwalCOD}`;
@@ -775,7 +774,6 @@ function submitOrder() {
     const cooldownKey = "lastOrderTime";
     const lastOrderTime = localStorage.getItem(cooldownKey);
 
-    // Anti spam cooldown
     if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
         const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
         alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
@@ -787,48 +785,60 @@ function submitOrder() {
     const jadwal = document.getElementById('jadwalCOD').value;
     const honey = document.getElementById('honey')?.value || "";
 
-    // Anti bot honeypot
     if (honey) {
         alert("❌ Deteksi bot!");
         return;
     }
 
-    // Validasi nama
     if (nama.length < 4 || !/^[a-zA-Z\s.']{4,50}$/.test(nama)) {
         alert("❌ Nama wajib huruf, minimal 4 karakter.");
         return;
     }
 
-    // Validasi nomor
     if (!/^08[0-9]{8,13}$/.test(nomor)) {
         alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
         return;
     }
 
-    // Validasi jadwal
     if (jadwal.length < 5) {
         alert("❌ Jadwal COD terlalu pendek. Contoh: 'Hari ini jam 5 sore'");
         return;
     }
 
-    // Simpan cooldown
     localStorage.setItem(cooldownKey, now.toString());
 
-    // Set hidden input
-    document.getElementById("formNama").value = nama;
-    document.getElementById("formNomor").value = nomor;
-    document.getElementById("formPaket").value = paketDipilih;
-    document.getElementById("formJadwal").value = jadwal;
-    document.getElementById("formToken").value = "iqbal_utari";
-
-
-    // Submit form
-    document.getElementById("orderForm").submit();
-
-    // Kirim ke Telegram
-    kirimTelegram(nama, nomor, paketDipilih, jadwal);
-
-    // Tutup popup
-    tutupForm();
+    // Kirim ke Google Apps Script dengan fetch
+    fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            nama: nama,
+            nomor: nomor,
+            jadwalCOD: jadwal,
+            paket: paketDipilih,
+            honeytrap: honey,
+            token: "iqbal_utari"
+        })
+    })
+    .then(response => response.text())
+    .then(result => {
+        if (result.includes("Akses ditolak")) {
+            alert("❌ Akses ditolak, bukan dari domain resmi!");
+        } else if (result.includes("Token tidak valid")) {
+            alert("❌ Token salah!");
+        } else if (result.includes("Bot Detected")) {
+            alert("❌ Deteksi bot!");
+        } else {
+            alert("✅ Pesanan berhasil dikirim!");
+            kirimTelegram(nama, nomor, paketDipilih, jadwal);
+            tutupForm();
+        }
+    })
+    .catch(error => {
+        console.error("❌ Error saat kirim pesanan:", error);
+        alert("❌ Gagal kirim pesanan.");
+    });
 }
 </script>
