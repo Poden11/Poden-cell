@@ -746,29 +746,6 @@ function tutupForm() {
     document.getElementById('popupForm').style.display = 'none';
 }
 
-function kirimTelegram(nama, nomor, paket, jadwalCOD) {
-    const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek";
-    const chat_id = "5983346518";
-    const message = 
-`📦 *Order Baru Masuk!*\n👤 Nama: ${nama}\n📱 Nomor: ${nomor}\n📦 Paket: ${paket}\n🚚 COD: ${jadwalCOD}`;
-
-    const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
-
-    fetch(telegramUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            chat_id: chat_id,
-            text: message,
-            parse_mode: "Markdown"
-        })
-    }).catch(err => {
-        console.error("Telegram error:", err);
-    });
-}
-
 function submitOrder() {
     const now = Date.now();
     const cooldownKey = "lastOrderTime";
@@ -807,7 +784,6 @@ function submitOrder() {
 
     localStorage.setItem(cooldownKey, now.toString());
 
-    // Kirim ke Google Apps Script dengan fetch
     fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
         method: "POST",
         headers: {
@@ -819,7 +795,7 @@ function submitOrder() {
             jadwalCOD: jadwal,
             paket: paketDipilih,
             honeytrap: honey,
-            token: "iqbal_utari"
+            token: "iqbal_utari" // Token ini lu validasi di Apps Script
         })
     })
     .then(response => response.text())
@@ -832,7 +808,6 @@ function submitOrder() {
             alert("❌ Deteksi bot!");
         } else {
             alert("✅ Pesanan berhasil dikirim!");
-            kirimTelegram(nama, nomor, paketDipilih, jadwal);
             tutupForm();
         }
     })
@@ -842,3 +817,4 @@ function submitOrder() {
     });
 }
 </script>
+
