@@ -739,84 +739,90 @@ function tutupForm() {
     document.getElementById('popupForm').style.display = 'none';
 }
 
-// (opsional) kalau masih mau kirim ke Telegram juga:
+// Kirim ke Telegram (opsional)
 function kirimTelegram(nama, nomor, paket, jadwalCOD) {
-  const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek"; // token bot lo
-  const chat_id = "5983346518";
-  const message = 
+    const token = "7927597318:AAG1AXlmcVhAs7GdcN9pXhdiKK0Gz-aHmek"; // ganti sama token bot lo
+    const chat_id = "5983346518";
+    const message = 
 `📦 *Order Baru Masuk!*\n👤 Nama: ${nama}\n📱 Nomor: ${nomor}\n📦 Paket: ${paket}\n🚚 COD: ${jadwalCOD}`;
 
-  const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+    const telegramUrl = `https://api.telegram.org/bot${token}/sendMessage`;
 
-  fetch(telegramUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      chat_id: chat_id,
-      text: message,
-      parse_mode: "Markdown"
-    })
-  }).catch(err => {
-    console.error("Telegram error:", err);
-  });
+    fetch(telegramUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            chat_id: chat_id,
+            text: message,
+            parse_mode: "Markdown"
+        })
+    }).catch(err => {
+        console.error("Telegram error:", err);
+    });
 }
 
 function submitOrder() {
-
-const now = Date.now();
+    const now = Date.now();
     const cooldownKey = "lastOrderTime";
     const lastOrderTime = localStorage.getItem(cooldownKey);
 
+    // Anti spam cooldown
     if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
         const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
         alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
         return;
     }
 
-    
     const nama = document.getElementById('userName').value;
     const nomor = document.getElementById('userNumber').value;
     const jadwal = document.getElementById('jadwalCOD').value;
+    const honey = document.getElementById('honey')?.value || "";
 
-     if (nama.length < 4 || !/^[a-zA-Z\s.']{4,50}$/.test(nama)) {
-    alert("❌ Nama wajib huruf, minimal 4 karakter.");
-    return;
-}
+    // Anti bot honeypot
+    if (honey) {
+        alert("❌ Deteksi bot!");
+        return;
+    }
 
+    // Validasi nama
+    if (nama.length < 4 || !/^[a-zA-Z\s.']{4,50}$/.test(nama)) {
+        alert("❌ Nama wajib huruf, minimal 4 karakter.");
+        return;
+    }
+
+    // Validasi nomor
     if (!/^08[0-9]{8,13}$/.test(nomor)) {
         alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
         return;
     }
 
+    // Validasi jadwal
     if (jadwal.length < 5) {
         alert("❌ Jadwal COD terlalu pendek. Contoh: 'Hari ini jam 5 sore'");
         return;
     }
 
-    if (!nama.trim() || !jadwal.trim()) {
-        alert("❌ Nama dan jadwal COD wajib diisi!");
-        return;
-    }
+    // Simpan cooldown
+    localStorage.setItem(cooldownKey, now.toString());
 
-     localStorage.setItem(cooldownKey, now.toString());
-
-    // isi form tersembunyi
+    // Set hidden input
     document.getElementById("formNama").value = nama;
     document.getElementById("formNomor").value = nomor;
     document.getElementById("formPaket").value = paketDipilih;
     document.getElementById("formJadwal").value = jadwal;
 
-    // kirim ke Google Apps Script
+    // Submit form
     document.getElementById("orderForm").submit();
 
-    // (opsional) kirim juga ke Telegram
+    // Kirim ke Telegram
     kirimTelegram(nama, nomor, paketDipilih, jadwal);
 
-    // tutup form popup
+    // Tutup popup
     tutupForm();
 }
 </script>
+
 
 
