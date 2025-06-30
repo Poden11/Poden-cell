@@ -764,6 +764,18 @@ function kirimTelegram(nama, nomor, paket, jadwalCOD) {
 }
 
 function submitOrder() {
+
+const now = Date.now();
+    const cooldownKey = "lastOrderTime";
+    const lastOrderTime = localStorage.getItem(cooldownKey);
+
+    if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
+        const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
+        alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
+        return;
+    }
+
+    
     const nama = document.getElementById('userName').value;
     const nomor = document.getElementById('userNumber').value;
     const jadwal = document.getElementById('jadwalCOD').value;
@@ -787,6 +799,8 @@ function submitOrder() {
         alert("❌ Nama dan jadwal COD wajib diisi!");
         return;
     }
+
+     localStorage.setItem(cooldownKey, now.toString());
 
     // isi form tersembunyi
     document.getElementById("formNama").value = nama;
