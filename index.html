@@ -901,7 +901,7 @@ function submitTopUp() {
   const nama = document.getElementById('topupName').value.trim();
   const ewallet = document.getElementById('ewalletType').value;
   const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
-  const nomorTopup = document.getElementById('topupNumber').value.trim();
+  const nomor = document.getElementById('topupNumber').value.trim();
 
   // Validasi
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
@@ -919,12 +919,11 @@ function submitTopUp() {
     return;
   }
 
-  if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
+  if (!/^08[0-9]{8,13}$/.test(nomor)) {
     alert("❌ Nomor harus valid dan diawali 08");
     return;
   }
 
-  // Anti-spam cooldown
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
   if (lastOrder && now - lastOrder < 30000) {
@@ -933,12 +932,9 @@ function submitTopUp() {
     return;
   }
 
-  // Kirim ke Apps Script via fetch()
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       nama: nama,
       ewallet: ewallet,
