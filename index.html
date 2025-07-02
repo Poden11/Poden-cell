@@ -902,28 +902,33 @@ function submitTopUp() {
   const ewallet = document.getElementById('ewalletType').value;
   const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
   const nomor = document.getElementById('topupNumber').value.trim();
+  const nomorTopup = nomor; // ⬅️ alias agar tidak bentrok
 
-  // Validasi
+  // Validasi Nama
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
     alert("❌ Nama harus huruf minimal 4 karakter");
     return;
   }
 
+  // Validasi E-Wallet
   if (!ewallet) {
     alert("❌ Pilih e-wallet terlebih dahulu");
     return;
   }
 
+  // Validasi Nominal Saldo
   if (!jumlahSaldo || isNaN(jumlahSaldo) || parseInt(jumlahSaldo) < 1000) {
     alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
     return;
   }
 
-  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+  // Validasi Nomor Tujuan
+  if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
     alert("❌ Nomor harus valid dan diawali 08");
     return;
   }
 
+  // Anti-spam cooldown 30 detik
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
   if (lastOrder && now - lastOrder < 30000) {
@@ -932,9 +937,12 @@ function submitTopUp() {
     return;
   }
 
+  // Kirim via fetch ke Apps Script
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
     body: new URLSearchParams({
       nama: nama,
       ewallet: ewallet,
@@ -948,6 +956,7 @@ function submitTopUp() {
       origin: location.origin
     })
   })
+
   .then(res => res.text())
   .then(result => {
     if (result.includes("success")) {
@@ -960,7 +969,7 @@ function submitTopUp() {
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Error saat mengirim");
+    alert("❌ Error saat mengirim.");
   });
 }
 
