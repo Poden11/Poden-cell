@@ -848,11 +848,6 @@ function submitOrder() {
         return;
     }
 
-    if (jadwal.length < 5) {
-        alert("❌ Jadwal COD terlalu pendek. Contoh: 'Hari ini jam 5 sore'");
-        return;
-    }
-
     localStorage.setItem(cooldownKey, now.toString());
 
     fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
