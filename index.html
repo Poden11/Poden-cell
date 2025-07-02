@@ -690,80 +690,38 @@
   <button onclick="tutupForm()" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
 </div>
 
-<div id="popupTopup" style="
-  display: none;
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 20px;
-  z-index: 9999;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  width: 90%;
-  max-width: 400px;
-  font-family: 'Arial', sans-serif;
-">
-  <h2 style="margin-top: 0; color: #333;">💰 Top Up E-Wallet</h2>
+<div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
+  <h3>Top Up Saldo E-Wallet</h3>
 
   <!-- Nama -->
-  <label for="topupName" style="font-weight: bold;">Nama Lengkap</label>
-  <input type="text" id="topupName" placeholder="Contoh: Budi Santoso" style="
-    width: 100%; padding: 12px; margin: 8px 0 16px;
-    border: 1px solid #ccc; border-radius: 8px;
-  ">
+  <input type="text" id="topupName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
 
-  <!-- E-wallet -->
-  <label for="ewalletType" style="font-weight: bold;">Pilih E-Wallet</label>
-  <select id="ewalletType" style="
-    width: 100%; padding: 12px; margin-bottom: 16px;
-    border: 1px solid #ccc; border-radius: 8px;
-  ">
-    <option value="">-- Pilih E-Wallet --</option>
+  <!-- Jenis E-Wallet -->
+  <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;">
+    <option value="">Pilih E-Wallet</option>
     <option value="DANA">DANA</option>
     <option value="GoPay">GoPay</option>
+    <option value="OVO">OVO</option>
+    <option value="ShopeePay">ShopeePay</option>
   </select>
 
-  <!-- Nominal -->
-  <label for="topupAmount" style="font-weight: bold;">Jumlah Saldo</label>
-  <input type="number" id="topupAmount" placeholder="Contoh: 20000" style="
-    width: 100%; padding: 12px; margin-bottom: 16px;
-    border: 1px solid #ccc; border-radius: 8px;
-  ">
+  <!-- Jumlah Saldo -->
+  <input type="number" id="jumlahSaldo" placeholder="Jumlah Saldo (contoh: 10000)" style="width:100%; padding:10px; margin:10px 0;">
 
-  <!-- Nomor tujuan -->
-  <label for="topupNumber" style="font-weight: bold;">Nomor Tujuan</label>
-  <input type="text" id="topupNumber" placeholder="08xxxxxxxxxx" style="
-    width: 100%; padding: 12px; margin-bottom: 16px;
-    border: 1px solid #ccc; border-radius: 8px;
-  ">
+  <!-- Nomor Tujuan -->
+  <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
 
-  <!-- Jadwal COD (Hanya 1 pilihan tetap) -->
-  <input type="hidden" id="topupCOD" value="COD jam 5 sore">
+  <!-- Jadwal COD -->
+  <div style="margin:10px 0;">
+    <strong>Jadwal COD:</strong><br>
+    <label><input type="radio" name="jadwalCodTopup" value="COD jam 5 sore" checked> Jam 5 sore</label>
+  </div>
 
   <!-- Tombol -->
-  <div style="text-align: right; margin-top: 20px;">
-    <button onclick="submitTopUp()" style="
-      padding: 10px 18px;
-      background: #25D366;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    ">✅ Kirim</button>
-
-    <button onclick="document.getElementById('popupTopup').style.display='none'" style="
-      padding: 10px 18px;
-      margin-left: 10px;
-      background: #e0e0e0;
-      border: none;
-      border-radius: 10px;
-      color: #333;
-      cursor: pointer;
-    ">❌ Batal</button>
-  </div>
+  <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
+  <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
 </div>
+
 
 
 <div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
@@ -820,24 +778,20 @@
                     
 <div style="text-align:center; margin-top:30px;">
   <button onclick="document.getElementById('popupTopup').style.display='block'" class="order-btn" style="font-size:16px; padding:14px 24px;">Top Up E-Wallet Sekarang</button>
-</div>
-                </div>
-                <div class="payment-card">
-                    <div class="payment-icon">🔌</div>
-                    <h3>Isi Pulsa All Operator</h3>
-                    <p>Butuh pulsa darurat? Bisa isi Telkomsel, Indosat, XL, Tri dan lainnya.</p>
-                    <div style="text-align:center; margin-top:20px;">
-        <button onclick="document.getElementById('popupPulsa').style.display='block'" class="order-btn" style="font-size:16px; padding:14px 24px;">Isi Pulsa Sekarang</button>
-        </div>
+    </div>
+      </div>
+        <div class="payment-card">
+          <div class="payment-icon">🔌</div>
+            <h3>Isi Pulsa All Operator</h3>
+              <p>Butuh pulsa darurat? Bisa isi Telkomsel, Indosat, XL, Tri dan lainnya.</p>
+                <div style="text-align:center; margin-top:20px;">
+                  <button onclick="document.getElementById('popupPulsa').style.display='block'" class="order-btn" style="font-size:16px; padding:14px 24px;">Isi Pulsa Sekarang</button>
+                   </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-
-
-
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -953,21 +907,22 @@ let lastOrderTime = localStorage.getItem("lastOrderTime");
 let now = Date.now();
 
 function submitTopUp() {
-  const nama = document.getElementById('topupName').value.trim();
-  const ewallet = document.getElementById('ewalletType').value;
-  const nominal = document.getElementById('topupAmount').value.trim();
-  const nomor = document.getElementById('topupNumber').value.trim();
-  const jadwalCOD = document.getElementById('topupCOD').value; // hidden input
-
   const now = Date.now();
-  const lastOrderTime = localStorage.getItem("lastOrderTime");
+  const cooldownKey = "lastOrderTime";
+  const lastOrderTime = localStorage.getItem(cooldownKey);
+
   if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
     alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
     return;
   }
 
-  if (nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
+  const nama = document.getElementById('topupName').value.trim();
+  const ewallet = document.getElementById('ewalletType').value;
+  const nomor = document.getElementById('topupNumber').value.trim();
+  const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim(); // ✅ Tambahan
+
+  if (!nama || nama.length < 4) {
     alert("❌ Nama harus huruf minimal 4 karakter");
     return;
   }
@@ -982,8 +937,8 @@ function submitTopUp() {
     return;
   }
 
-  if (!nominal || isNaN(nominal) || parseInt(nominal) < 1000) {
-    alert("❌ Nominal saldo harus valid (minimal 1000)");
+  if (!jumlahSaldo || isNaN(jumlahSaldo) || parseInt(jumlahSaldo) < 1000) {
+    alert("❌ Jumlah saldo tidak valid");
     return;
   }
 
@@ -995,10 +950,10 @@ function submitTopUp() {
       nomor: nomor,
       nomorTopup: nomor,
       ewallet: ewallet,
-      jumlahSaldo: nominal,
+      jumlahSaldo: jumlahSaldo,
       jenisOrder: "topup",
       paket: `Top Up via ${ewallet}`,
-      jadwalCOD: jadwalCOD,
+      jadwalCOD: "COD jam 5 sore",
       honeytrap: "",
       token: "r8i7VnYxZqP4LsKmT2wE",
       origin: location.origin
@@ -1009,7 +964,7 @@ function submitTopUp() {
     if (result.includes("success")) {
       alert("✅ Top Up berhasil dikirim!");
       document.getElementById("popupTopup").style.display = "none";
-      localStorage.setItem("lastOrderTime", Date.now());
+      localStorage.setItem(cooldownKey, now.toString()); // ⏱️ Set cooldown
     } else {
       alert("❌ Gagal kirim top up: " + result);
     }
@@ -1019,6 +974,7 @@ function submitTopUp() {
     console.error(err);
   });
 }
+
 function submitPulsa() {
   const nama = document.getElementById('pulsaName').value.trim();
   const nomor = document.getElementById('pulsaNumber').value.trim();
