@@ -885,41 +885,92 @@ function submitOrder() {
 }
 
 function submitTopUp() {
-    const nama = document.getElementById('topupName').value;
-    const ewallet = document.getElementById('ewalletType').value;
-    const nomor = document.getElementById('topupNumber').value;
+  const nama = document.getElementById('topupName').value;
+  const ewallet = document.getElementById('ewalletType').value;
+  const nomor = document.getElementById('topupNumber').value;
 
-    if (nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
-        alert("❌ Nama harus valid minimal 4 huruf.");
-        return;
-    }
+  if (nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
+    alert("❌ Nama harus valid minimal 4 huruf.");
+    return;
+  }
 
-    if (!/^08[0-9]{8,13}$/.test(nomor)) {
-        alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
-        return;
-    }
+  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+    alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
+    return;
+  }
 
-    document.getElementById('formNama').value = nama;
-    document.getElementById('formNomor').value = nomor;
-    document.getElementById('formPaket').value = `Top Up via ${ewallet}`;
-    document.getElementById('formJenisOrder').value = "topup";
-    document.getElementById('formEwallet').value = ewallet;
-    document.getElementById('formNomorTopup').value = nomor;
-    document.getElementById('formJadwal').value = "COD jam 5 sore";
-    document.getElementById('formToken').value = "r8i7VnYxZqP4LsKmT2wE";
-
-    fetch(document.getElementById('orderForm').action, {
-        method: "POST",
-        body: new FormData(document.getElementById('orderForm'))
+  fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      nama: nama,
+      nomorTopup: nomor,
+      ewallet: ewallet,
+      jenisOrder: "topup",
+      token: "r8i7VnYxZqP4LsKmT2wE",
+      origin: location.origin
     })
-    .then(res => res.text())
-    .then(result => {
-        alert("✅ Top Up berhasil dikirim!");
-        document.getElementById("popupTopup").style.display = "none";
-    })
-    .catch(err => {
-        alert("❌ Gagal kirim top up");
-        console.error(err);
-    });
+  })
+  .then(res => res.text())
+  .then(result => {
+    alert("✅ Top Up berhasil dikirim!");
+    document.getElementById("popupTopup").style.display = "none";
+  })
+  .catch(err => {
+    alert("❌ Gagal kirim top up");
+    console.error(err);
+  });
 }
+
+    function submitPulsa() {
+  const nama = document.getElementById('pulsaName').value;
+  const nomor = document.getElementById('topupNumber').value;
+  const operator = document.getElementById('pulsaOperator').value;
+  const nominal = document.getElementById('pulsaNominal').value;
+  const metode = document.querySelector('input[name="pulsaPembayaran"]:checked')?.value;
+
+  if (nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
+    alert("❌ Nama harus valid minimal 4 huruf.");
+    return;
+  }
+
+  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+    alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
+    return;
+  }
+
+  if (!operator || !nominal || !metode) {
+    alert("❌ Semua data wajib diisi.");
+    return;
+  }
+
+  fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      nama: nama,
+      nomor: nomor,
+      operator: operator,
+      nominalPulsa: nominal,
+      metodePulsa: metode,
+      jenisOrder: "pulsa",
+      token: "r8i7VnYxZqP4LsKmT2wE",
+      origin: location.origin
+    })
+  })
+  .then(res => res.text())
+  .then(result => {
+    alert("✅ Order pulsa berhasil dikirim!");
+    document.getElementById("popupPulsa").style.display = "none";
+  })
+  .catch(err => {
+    alert("❌ Gagal kirim pulsa");
+    console.error(err);
+  });
+}
+
 </script>
