@@ -693,25 +693,22 @@
 <div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
   <h3>Top Up Saldo E-Wallet</h3>
   <input type="text" id="topupName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
-
   <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;">
     <option value="">Pilih E-Wallet</option>
     <option value="DANA">DANA</option>
     <option value="GoPay">GoPay</option>
   </select>
-
   <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
-
   <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
   <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
 </div>
 
 <div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
-  <h3>Isi Pulsa All Operator</h3>
+  <h3>Form Isi Pulsa</h3>
 
   <input type="text" id="pulsaName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
-  <input type="text" id="topupNumber" placeholder="Nomor HP (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
-  
+  <input type="text" id="pulsaNumber" placeholder="Nomor HP (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
+
   <select id="pulsaOperator" style="width:100%; padding:10px; margin:10px 0;">
     <option value="">Pilih Operator</option>
     <option value="Telkomsel">Telkomsel</option>
@@ -722,14 +719,18 @@
     <option value="Smartfren">Smartfren</option>
   </select>
 
-  <input type="text" id="pulsaNominal" placeholder="Nominal (contoh: 10.000)" style="width:100%; padding:10px; margin:10px 0;">
-  
-  <label><input type="radio" name="pulsaPembayaran" value="COD jam 5 sore"> COD jam 5 sore</label><br>
-  <label><input type="radio" name="pulsaPembayaran" value="E-Wallet"> E-Wallet (DANA dan GOPAY)</label><br><br>
+  <input type="text" id="pulsaNominal" placeholder="Nominal Pulsa (contoh: 10000)" style="width:100%; padding:10px; margin:10px 0;">
 
-  <button onclick="submitPulsa()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
-  <button onclick="document.getElementById('popupPulsa').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+  <p style="margin:8px 0;">Metode Pembayaran:</p>
+  <label><input type="radio" name="pulsaPembayaran" value="COD"> COD</label>
+  <label><input type="radio" name="pulsaPembayaran" value="E-Wallet" style="margin-left:15px;"> E-Wallet</label>
+
+  <div style="margin-top:15px;">
+    <button onclick="submitPulsa()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
+    <button onclick="document.getElementById('popupPulsa').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+  </div>
 </div>
+
 
 
     <form id="orderForm" action="https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec" method="POST" style="display:none;">
@@ -892,6 +893,8 @@ function submitTopUp() {
   const nama = document.getElementById('topupName').value.trim();
   const ewallet = document.getElementById('ewalletType').value;
   const nomor = document.getElementById('topupNumber').value.trim();
+  const now = Date.now();
+  const lastOrderTime = localStorage.getItem("lastOrderTime");
 
   if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
@@ -916,7 +919,9 @@ function submitTopUp() {
 
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
     body: new URLSearchParams({
       nama: nama,
       nomor: nomor,
@@ -950,8 +955,11 @@ function submitPulsa() {
   const nama = document.getElementById('pulsaName').value.trim();
   const nomor = document.getElementById('pulsaNumber').value.trim();
   const operator = document.getElementById('pulsaOperator').value;
-  const nominal = document.getElementById('pulsaNominal').value;
+  const nominal = document.getElementById('pulsaNominal').value.trim();
   const metode = document.querySelector('input[name="pulsaPembayaran"]:checked')?.value;
+
+  const now = Date.now();
+  const lastOrderTime = localStorage.getItem("lastOrderTime");
 
   if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
@@ -959,8 +967,28 @@ function submitPulsa() {
     return;
   }
 
-  if (!nama || !nomor || !operator || !nominal || !metode) {
-    alert("❌ Semua data harus diisi!");
+  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
+    alert("❌ Nama wajib huruf, minimal 4 karakter.");
+    return;
+  }
+
+  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+    alert("❌ Nomor HP tidak valid (harus diawali 08 dan panjang cukup).");
+    return;
+  }
+
+  if (!operator) {
+    alert("❌ Pilih operator terlebih dahulu.");
+    return;
+  }
+
+  if (!/^[0-9]{4,7}$/.test(nominal)) {
+    alert("❌ Nominal pulsa harus angka dan minimal 4 digit (contoh: 10000)");
+    return;
+  }
+
+  if (!metode) {
+    alert("❌ Pilih metode pembayaran dulu.");
     return;
   }
 
