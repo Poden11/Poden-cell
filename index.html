@@ -693,31 +693,19 @@
 <div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
   <h3>Top Up Saldo E-Wallet</h3>
 
-  <!-- Nama -->
   <input type="text" id="topupName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
-
-  <!-- Jenis E-Wallet -->
+  
   <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;">
     <option value="">Pilih E-Wallet</option>
     <option value="DANA">DANA</option>
     <option value="GoPay">GoPay</option>
     <option value="OVO">OVO</option>
-    <option value="ShopeePay">ShopeePay</option>
   </select>
 
-  <!-- Jumlah Saldo -->
-  <input type="number" id="jumlahSaldo" placeholder="Jumlah Saldo (contoh: 10000)" style="width:100%; padding:10px; margin:10px 0;">
-
-  <!-- Nomor Tujuan -->
+  <input type="number" id="jumlahSaldo" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;">
+  
   <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
 
-  <!-- Jadwal COD -->
-  <div style="margin:10px 0;">
-    <strong>Jadwal COD:</strong><br>
-    <label><input type="radio" name="jadwalCodTopup" value="COD jam 5 sore" checked> Jam 5 sore</label>
-  </div>
-
-  <!-- Tombol -->
   <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
   <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
 </div>
@@ -907,28 +895,14 @@ let lastOrderTime = localStorage.getItem("lastOrderTime");
 let now = Date.now();
 
 function submitTopUp() {
-  const now = Date.now();
-  const cooldownKey = "lastOrderTime";
-  const lastOrderTime = localStorage.getItem(cooldownKey);
-
-  if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
-    const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
-    alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
-    return;
-  }
-
   const nama = document.getElementById('topupName').value.trim();
   const ewallet = document.getElementById('ewalletType').value;
+  const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
   const nomor = document.getElementById('topupNumber').value.trim();
-  const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim(); // ✅ Tambahan
 
-  if (!nama || nama.length < 4) {
+  // Validasi
+  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
     alert("❌ Nama harus huruf minimal 4 karakter");
-    return;
-  }
-
-  if (!/^08[0-9]{8,13}$/.test(nomor)) {
-    alert("❌ Nomor harus valid dan diawali 08");
     return;
   }
 
@@ -938,7 +912,21 @@ function submitTopUp() {
   }
 
   if (!jumlahSaldo || isNaN(jumlahSaldo) || parseInt(jumlahSaldo) < 1000) {
-    alert("❌ Jumlah saldo tidak valid");
+    alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
+    return;
+  }
+
+  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+    alert("❌ Nomor harus valid dan diawali 08");
+    return;
+  }
+
+  // Cegah spam
+  const now = Date.now();
+  const lastOrder = localStorage.getItem("lastOrderTime");
+  if (lastOrder && now - lastOrder < 30000) {
+    const sisa = Math.ceil((30000 - (now - lastOrder)) / 1000);
+    alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
     return;
   }
 
@@ -947,10 +935,9 @@ function submitTopUp() {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       nama: nama,
-      nomor: nomor,
-      nomorTopup: nomor,
       ewallet: ewallet,
       jumlahSaldo: jumlahSaldo,
+      nomorTopup: nomor,
       jenisOrder: "topup",
       paket: `Top Up via ${ewallet}`,
       jadwalCOD: "COD jam 5 sore",
@@ -964,14 +951,14 @@ function submitTopUp() {
     if (result.includes("success")) {
       alert("✅ Top Up berhasil dikirim!");
       document.getElementById("popupTopup").style.display = "none";
-      localStorage.setItem(cooldownKey, now.toString()); // ⏱️ Set cooldown
+      localStorage.setItem("lastOrderTime", now);
     } else {
       alert("❌ Gagal kirim top up: " + result);
     }
   })
   .catch(err => {
-    alert("❌ Error saat mengirim");
     console.error(err);
+    alert("❌ Error saat mengirim");
   });
 }
 
