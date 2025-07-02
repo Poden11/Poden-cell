@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -466,7 +467,7 @@
                 <div class="logo">
                     <div>
                         <div class="logo-text">PODEN CELL</div>
-                        <div class="tagline">Cepat, Hemat & Anti Bikin Dompet Sekarat</div>
+                        <div class="tagline">Go Digital Go Smart Go Poden</div>
                     </div>
                 </div>
                 <a href="https://wa.me/6283847427357" class="whatsapp-btn">💬 Chat WhatsApp</a>
@@ -477,12 +478,12 @@
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>KUOTA MURAH & TERPERCAYA</h1>
+                <h1>Kuota Masuk Cepat, Harga Tetap Hemat</h1>
                 <p>Melayani COD Keliling Setiap Hari Jam 5 Sore!</p>
                 
                 <div class="delivery-info">
                     <h3>🏍️ LAYANAN COD DELIVERY</h3>
-                    <p>Pesan sekarang, bayar saat kuota sudah masuk! Kami keliling setiap hari jam 17:00 WIB</p>
+                    <p>Pesan sekarang, kuota langsung masuk. Bayar cash pas sore, jam 17.00 WIB kita keliling</p>
                 </div>
             </div>
             
@@ -657,54 +658,120 @@
         </div>
     </section>
 <div id="popupForm" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
-  <h3>Masukkan Nama & Jadwal COD</h3>
-<input type="text" id="userName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
-<input type="text" id="jadwalCOD" placeholder="Misal: Hari ini jam 5 sore" style="width:100%; padding:10px; margin:10px 0;">
+  <h3>Masukkan Detail Pemesanan</h3>
 
-<input type="text" id="honeytrap" name="honeytrap" style="display:none;">
-
-
+  <input type="text" id="userName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
   <input type="text" id="userNumber" placeholder="08xxxxxxxxxx" style="width:100%; padding:10px; margin:10px 0;">
+  
+  <select id="paymentMethod" onchange="togglePaymentOptions()" style="width:100%; padding:10px; margin:10px 0;">
+    <option value="">Pilih Jenis Pembayaran</option>
+    <option value="COD">COD (Bayar Jam 17.00 WIB)</option>
+    <option value="E-Wallet">E-Wallet (Tersedia DANA dan GOPAY)</option>
+  </select>
+
+  <div id="codOptions" style="display:none;">
+    <select id="jadwalCOD" style="width:100%; padding:10px; margin:10px 0;">
+      <option value="">Pilih Jadwal COD</option>
+      <option value="Jam 4 Sore">Jam 4 Sore</option>
+      <option value="Jam 5 Sore">Jam 5 Sore</option>
+    </select>
+  </div>
+
+  <div id="ewalletOptions" style="display:none;">
+    <select id="ewallet" style="width:100%; padding:10px; margin:10px 0;">
+      <option value="">Pilih E-Wallet</option>
+      <option value="DANA">DANA</option>
+      <option value="GoPay">GoPay</option>
+    </select>
+  </div>
+
+  <input type="text" id="honeytrap" name="honeytrap" style="display:none;">
+
   <button onclick="submitOrder()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
   <button onclick="tutupForm()" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+</div>
+
+<div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
+  <h3>Top Up Saldo E-Wallet</h3>
+  <input type="text" id="topupName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
+
+  <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;">
+    <option value="">Pilih E-Wallet</option>
+    <option value="DANA">DANA</option>
+    <option value="GoPay">GoPay</option>
+  </select>
+
+  <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
+
+  <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
+  <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+</div>
+
+<div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
+  <h3>Isi Pulsa All Operator</h3>
+
+  <input type="text" id="pulsaName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
+
+  <select id="pulsaOperator" style="width:100%; padding:10px; margin:10px 0;">
+    <option value="">Pilih Operator</option>
+    <option value="Telkomsel">Telkomsel</option>
+    <option value="Indosat">Indosat</option>
+    <option value="Axis">Axis</option>
+    <option value="XL">XL</option>
+    <option value="Tri">Tri</option>
+    <option value="Tri">Smartfren</option>
+  </select>
+
+  <input type="text" id="pulsaNominal" placeholder="Nominal (contoh: 10.000)" style="width:100%; padding:10px; margin:10px 0;">
+
+  <label><input type="radio" name="pulsaPembayaran" value="COD jam 5 sore"> COD jam 5 sore</label><br>
+  <label><input type="radio" name="pulsaPembayaran" value="E-Wallet"> E-Wallet</label>
+
+  <button onclick="submitPulsa()" style="padding:10px 15px; margin-top:10px; background:#25D366; color:white; border:none; border-radius:8px;">Kirim</button>
+  <button onclick="document.getElementById('popupPulsa').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">Batal</button>
 </div>
 
     <form id="orderForm" action="https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec" method="POST" style="display:none;">
   <input type="hidden" name="nama" id="formNama">
   <input type="hidden" name="nomor" id="formNomor">
   <input type="hidden" name="paket" id="formPaket">
-  <input type="hidden" name="jadwalCOD" id="formJadwal">
-
-<input type="hidden" name="token" id="formToken">
-
-
-</form>
-
+  <input type="hidden" name="jadwalCOD" id="formJadwal"><input type="hidden" name="jenisOrder" id="formJenisOrder">
+  <input type="hidden" name="ewallet" id="formEwallet">
+  <input type="hidden" name="nomorTopup" id="formNomorTopup">
+ <input type="hidden" name="token" id="formToken">
+   </form>
 
 
-    <section class="payment-methods">
-        <div class="container">
-            <div class="payment-content">
-                <h2>METODE PEMBAYARAN</h2>
-                <div class="payment-grid">
-                    <div class="payment-card">
-                        <div class="payment-icon">💰</div>
-                        <h3>Cash on Delivery (COD)</h3>
-                        <p>Bayar langsung saat kuota sudah masuk ke nomor Anda. Kami keliling setiap hari jam 5 sore!</p>
-                    </div>
-                    <div class="payment-card">
-                        <div class="payment-icon">💳</div>
-                        <h3>E-Wallet</h3>
-                        <p>Transfer mudah dan cepat melalui aplikasi favorit Anda</p>
-                        <div class="ewallet-options">
-                            <a href="#" class="ewallet-btn" onclick="bukaForm('Pembayaran via DANA')">DANA</a>
-                            <a href="#" class="ewallet-btn" onclick="bukaForm('Pembayaran via GoPay')">GoPay</a>
-                        </div>
-                    </div>
+
+   <section class="payment-methods">
+    <div class="container">
+        <div class="payment-content">
+            <h2>TERSEDIA TOPUP SALDO & PULSA</h2>
+            <div class="payment-grid">
+                <div class="payment-card">
+                    <div class="payment-icon">📱</div>
+                    <h3>Top Up E-Wallet</h3>
+                    <p>Tersedia saldo DANA & GoPay langsung masuk tanpa delay. Cocok buat kebutuhan mendadak.</p>
+                    
+<div style="text-align:center; margin-top:30px;">
+  <button onclick="document.getElementById('popupTopup').style.display='block'" class="order-btn" style="font-size:16px; padding:14px 24px;">Top Up E-Wallet Sekarang</button>
+</div>
+                </div>
+                <div class="payment-card">
+                    <div class="payment-icon">🔌</div>
+                    <h3>Isi Pulsa All Operator</h3>
+                    <p>Butuh pulsa darurat? Bisa isi Telkomsel, Indosat, XL, Tri dan lainnya.</p>
+                    <div style="text-align:center; margin-top:20px;">
+        <button onclick="document.getElementById('popupPulsa').style.display='block'" class="order-btn" style="font-size:16px; padding:14px 24px;">Isi Pulsa Sekarang</button>
+        </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+
+
 
     <footer>
         <div class="container">
@@ -759,7 +826,11 @@ function submitOrder() {
 
     const nama = document.getElementById('userName').value;
     const nomor = document.getElementById('userNumber').value;
-    const jadwal = document.getElementById('jadwalCOD').value;
+    const metodePembayaran = document.querySelector('input[name="metode"]:checked');
+    const jadwal = metodePembayaran?.value === "COD"
+        ? document.querySelector('input[name="jamCOD"]:checked')?.value || ""
+        : document.querySelector('input[name="eWallet"]:checked')?.value || "";
+
     const honey = document.getElementById('honey')?.value || "";
 
     if (honey) {
@@ -817,5 +888,43 @@ function submitOrder() {
         alert("❌ Gagal kirim pesanan.");
     });
 }
-</script>
 
+function submitTopUp() {
+    const nama = document.getElementById('topupName').value;
+    const ewallet = document.getElementById('ewalletType').value;
+    const nomor = document.getElementById('topupNumber').value;
+
+    if (nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
+        alert("❌ Nama harus valid minimal 4 huruf.");
+        return;
+    }
+
+    if (!/^08[0-9]{8,13}$/.test(nomor)) {
+        alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
+        return;
+    }
+
+    document.getElementById('formNama').value = nama;
+    document.getElementById('formNomor').value = nomor;
+    document.getElementById('formPaket').value = `Top Up via ${ewallet}`;
+    document.getElementById('formJenisOrder').value = "topup";
+    document.getElementById('formEwallet').value = ewallet;
+    document.getElementById('formNomorTopup').value = nomor;
+    document.getElementById('formJadwal').value = "COD jam 5 sore";
+    document.getElementById('formToken').value = "r8i7VnYxZqP4LsKmT2wE";
+
+    fetch(document.getElementById('orderForm').action, {
+        method: "POST",
+        body: new FormData(document.getElementById('orderForm'))
+    })
+    .then(res => res.text())
+    .then(result => {
+        alert("✅ Top Up berhasil dikirim!");
+        document.getElementById("popupTopup").style.display = "none";
+    })
+    .catch(err => {
+        alert("❌ Gagal kirim top up");
+        console.error(err);
+    });
+}
+</script>
