@@ -742,7 +742,7 @@
 
 
 
-    <form id="orderForm" action="https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec" method="POST" style="display:none;">
+    <form id="orderForm" action= "https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec" method="POST" style="display:none;">
   <input type="hidden" name="nama" id="formNama">
   <input type="hidden" name="nomor" id="formNomor">
   <input type="hidden" name="paket" id="formPaket">
@@ -930,22 +930,25 @@ function submitTopUp() {
     return;
   }
 
-  fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      nama: nama,
-      ewallet: ewallet,
-      jumlahSaldo: jumlahSaldo,
-      nomorTopup: nomor,
-      jenisOrder: "topup",
-      paket: `Top Up via ${ewallet}`,
-      jadwalCOD: "COD jam 5 sore",
-      honeytrap: "",
-      token: "r8i7VnYxZqP4LsKmT2wE",
-      origin: location.origin
-    })
+ fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: new URLSearchParams({
+    nama: nama,
+    ewallet: ewallet,
+    jumlahSaldo: jumlahSaldo,
+    nomorTopup: nomor,
+    jenisOrder: "topup",
+    paket: `Top Up via ${ewallet}`,
+    jadwalCOD: "COD jam 5 sore",
+    honeytrap: "",
+    token: "r8i7VnYxZqP4LsKmT2wE",
+    origin: location.origin
   })
+})
+
   .then(res => res.text())
   .then(result => {
     if (result.includes("success")) {
