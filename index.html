@@ -690,11 +690,11 @@
   <button onclick="tutupForm()" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
 </div>
 
-<div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3);">
-  <h3>Top Up Saldo E-Wallet</h3>
+<div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
+  <h3 style="margin-top:0;">Top Up Saldo E-Wallet</h3>
 
   <input type="text" id="topupName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
-  
+
   <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;">
     <option value="">Pilih E-Wallet</option>
     <option value="DANA">DANA</option>
@@ -703,15 +703,18 @@
   </select>
 
   <input type="number" id="jumlahSaldo" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;">
-  
+
   <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
 
-  <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
-  <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+  <!-- Honeypot anti-bot -->
+  <input type="text" id="honey" name="honeytrap" style="display:none;">
+
+  <!-- Tombol -->
+  <div style="text-align:right; margin-top:10px;">
+    <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
+    <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+  </div>
 </div>
-
-
-
 <div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
   <h3>Form Isi Pulsa</h3>
 
@@ -742,17 +745,17 @@
 
 
 
-    <form id="orderForm" action= "https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec" method="POST" style="display:none;">
+    <form id="orderForm" action="https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec" method="POST" style="display:none;">
   <input type="hidden" name="nama" id="formNama">
-  <input type="hidden" name="nomor" id="formNomor">
-  <input type="hidden" name="paket" id="formPaket">
-  <input type="hidden" name="jadwalCOD" id="formJadwal"><input type="hidden" name="jenisOrder" id="formJenisOrder">
   <input type="hidden" name="ewallet" id="formEwallet">
+  <input type="hidden" name="jumlahSaldo" id="formJumlahSaldo">
   <input type="hidden" name="nomorTopup" id="formNomorTopup">
- <input type="hidden" name="token" id="formToken">
-   </form>
-
-
+  <input type="hidden" name="jadwalCOD" id="formJadwal">
+  <input type="hidden" name="paket" id="formPaket">
+  <input type="hidden" name="jenisOrder" id="formJenisOrder">
+  <input type="hidden" name="token" id="formToken">
+  <input type="hidden" name="origin" value="https://poden11.github.io">
+</form>
 
    <section class="payment-methods">
     <div class="container">
@@ -898,7 +901,7 @@ function submitTopUp() {
   const nama = document.getElementById('topupName').value.trim();
   const ewallet = document.getElementById('ewalletType').value;
   const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
-  const nomor = document.getElementById('topupNumber').value.trim();
+  const nomorTopup = document.getElementById('topupNumber').value.trim();
 
   // Validasi
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
@@ -916,12 +919,12 @@ function submitTopUp() {
     return;
   }
 
-  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+  if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
     alert("❌ Nomor harus valid dan diawali 08");
     return;
   }
 
-  // Cegah spam
+  // Anti-spam cooldown
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
   if (lastOrder && now - lastOrder < 30000) {
@@ -930,25 +933,25 @@ function submitTopUp() {
     return;
   }
 
- fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/x-www-form-urlencoded"
-  },
-  body: new URLSearchParams({
-    nama: nama,
-    ewallet: ewallet,
-    jumlahSaldo: jumlahSaldo,
-    nomorTopup: nomor,
-    jenisOrder: "topup",
-    paket: `Top Up via ${ewallet}`,
-    jadwalCOD: "COD jam 5 sore",
-    honeytrap: "",
-    token: "r8i7VnYxZqP4LsKmT2wE",
-    origin: location.origin
+  // Kirim ke Apps Script via fetch()
+  fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      nama: nama,
+      ewallet: ewallet,
+      jumlahSaldo: jumlahSaldo,
+      nomorTopup: nomorTopup,
+      jenisOrder: "topup",
+      paket: `Top Up via ${ewallet}`,
+      jadwalCOD: "COD jam 5 sore",
+      honeytrap: "",
+      token: "r8i7VnYxZqP4LsKmT2wE",
+      origin: location.origin
+    })
   })
-})
-
   .then(res => res.text())
   .then(result => {
     if (result.includes("success")) {
@@ -964,6 +967,7 @@ function submitTopUp() {
     alert("❌ Error saat mengirim");
   });
 }
+
 
 function submitPulsa() {
   const nama = document.getElementById('pulsaName').value.trim();
