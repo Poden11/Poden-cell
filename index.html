@@ -901,34 +901,34 @@ function submitTopUp() {
   const nama = document.getElementById('topupName').value.trim();
   const ewallet = document.getElementById('ewalletType').value;
   const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
-  const nomor = document.getElementById('topupNumber').value.trim();
-  const nomorTopup = nomor; // ⬅️ alias agar tidak bentrok
+  const nomorTopup = document.getElementById('topupNumber').value.trim(); // FIX: tambahkan ini
+  const honey = document.getElementById('honey').value;
 
-  // Validasi Nama
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
     alert("❌ Nama harus huruf minimal 4 karakter");
     return;
   }
 
-  // Validasi E-Wallet
   if (!ewallet) {
     alert("❌ Pilih e-wallet terlebih dahulu");
     return;
   }
 
-  // Validasi Nominal Saldo
   if (!jumlahSaldo || isNaN(jumlahSaldo) || parseInt(jumlahSaldo) < 1000) {
     alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
     return;
   }
 
-  // Validasi Nomor Tujuan
   if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
     alert("❌ Nomor harus valid dan diawali 08");
     return;
   }
 
-  // Anti-spam cooldown 30 detik
+  if (honey) {
+    alert("❌ Deteksi bot!");
+    return;
+  }
+
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
   if (lastOrder && now - lastOrder < 30000) {
@@ -937,7 +937,6 @@ function submitTopUp() {
     return;
   }
 
-  // Kirim via fetch ke Apps Script
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
     headers: {
@@ -948,15 +947,14 @@ function submitTopUp() {
       ewallet: ewallet,
       jumlahSaldo: jumlahSaldo,
       nomorTopup: nomorTopup,
-      jenisOrder: "topup",
-      paket: `Top Up via ${ewallet}`,
       jadwalCOD: "COD jam 5 sore",
+      paket: `Top Up via ${ewallet}`,
+      jenisOrder: "topup",
       honeytrap: "",
       token: "r8i7VnYxZqP4LsKmT2wE",
       origin: location.origin
     })
   })
-
   .then(res => res.text())
   .then(result => {
     if (result.includes("success")) {
@@ -969,10 +967,9 @@ function submitTopUp() {
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Error saat mengirim.");
+    alert("❌ Error saat mengirim");
   });
 }
-
 
 function submitPulsa() {
   const nama = document.getElementById('pulsaName').value.trim();
