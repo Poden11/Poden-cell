@@ -693,18 +693,18 @@
 <div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
   <h3 style="margin-top:0;">Top Up Saldo E-Wallet</h3>
 
-  <input type="text" id="topupName" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
+  <input type="text" id="topupName" autocomplete="name" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
 
-  <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;">
+  <select id="ewalletType" autocomplete="off" style="width:100%; padding:10px; margin:10px 0;">
     <option value="">Pilih E-Wallet</option>
     <option value="DANA">DANA</option>
     <option value="GoPay">GoPay</option>
     <option value="OVO">OVO</option>
   </select>
 
-  <input type="text" id="jumlahSaldo" inputmode="numeric" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;" maxlength="7">
+  <input type="number" id="jumlahSaldo" autocomplete="off" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;" min="1000" max="9999999">
 
-  <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;" maxlength="14">
+  <input type="tel" id="topupNumber" autocomplete="tel" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;" maxlength="14">
 
   <!-- Honeypot anti-bot -->
   <input type="text" id="honey" name="honeytrap" style="display:none;">
@@ -715,6 +715,7 @@
     <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px; cursor:pointer;">❌ Batal</button>
   </div>
 </div>
+
 
 <div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
   <h3>Form Isi Pulsa</h3>
