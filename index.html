@@ -706,6 +706,9 @@
 
   <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" autocomplete="tel-national" style="width:100%; padding:10px; margin:10px 0;" maxlength="14">
 
+  <input type="hidden" id="metodeTopup" value="COD jam 5 sore">
+
+
   <!-- Honeypot anti-bot -->
   <input type="text" id="honey" name="honeytrap" style="display:none;">
 
@@ -753,6 +756,7 @@
   <input type="hidden" name="ewallet" id="formEwallet">
   <input type="hidden" name="jumlahSaldo" id="formJumlahSaldo">
   <input type="hidden" name="nomorTopup" id="formNomorTopup">
+  <input type="hidden" name="metodeTopup" id="formMetodeTopup">
   <input type="hidden" name="jadwalCOD" id="formJadwal">
   <input type="hidden" name="paket" id="formPaket">
   <input type="hidden" name="jenisOrder" id="formJenisOrder">
@@ -946,59 +950,56 @@ function submitTopUp() {
     return resetButton();
   }
 
-  fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      nama,
-      ewallet,
-      jumlahSaldo: jumlahInt,
-      nomorTopup,
-      jadwalCOD: "COD jam 5 sore",
-      paket: `Top Up via ${ewallet}`,
-      jenisOrder: "topup",
-      honeytrap: "",
-      token: "r8i7VnYxZqP4LsKmT2wE",
-      origin: location.origin
-    })
+ fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body: new URLSearchParams({
+    nama,
+    ewallet,
+    jumlahSaldo: jumlahInt,
+    nomorTopup,
+    jadwalCOD: "COD jam 5 sore",
+    paket: `Top Up via ${ewallet}`,
+    jenisOrder: "topup",
+    metodeTopup: "COD jam 5 sore",
+    honeytrap: "",
+    token: "r8i7VnYxZqP4LsKmT2wE",
+    origin: location.origin
   })
-  .then(res => res.text())
-  .then(result => {
-    try {
-      const json = JSON.parse(result);
-      if (json.status === "success") {
-        alert("✅ Top Up berhasil dikirim!");
-        document.getElementById("popupTopup").style.display = "none";
-        localStorage.setItem("lastOrderTime", now);
-        clearForm();
-      } else {
-        alert("❌ Gagal kirim: " + (json.message || "Unknown error"));
-      }
-    } catch {
-      alert("❌ Respon tidak valid dari server:\n" + result);
+})
+.then(res => res.text())
+.then(result => {
+  try {
+    const json = JSON.parse(result);
+    if (json.status === "success") {
+      alert("✅ Top Up berhasil dikirim!");
+      document.getElementById("popupTopup").style.display = "none";
+      localStorage.setItem("lastOrderTime", now);
+      clearForm();
+    } else {
+      alert("❌ Gagal kirim: " + (json.message || "Unknown error"));
     }
-    resetButton();
-  })
-  .catch(err => {
-    console.error(err);
-    alert("❌ Error saat mengirim");
-    resetButton();
-  });
-
-  function resetButton() {
-    submitBtn.disabled = false;
-    submitBtn.innerText = "✅ Kirim";
+  } catch {
+    alert("❌ Respon tidak valid dari server:\n" + result);
   }
-
-  function clearForm() {
-    document.getElementById('topupName').value = "";
-    document.getElementById('ewalletType').value = "";
-    document.getElementById('jumlahSaldo').value = "";
-    document.getElementById('topupNumber').value = "";
-  }
+  resetButton();
+})
+.catch(err => {
+  console.error(err);
+  alert("❌ Error saat mengirim");
+  resetButton();
+});
+function resetButton() {
+  submitBtn.disabled = false;
+  submitBtn.innerText = "✅ Kirim";
 }
 
-
+function clearForm() {
+  document.getElementById('topupName').value = "";
+  document.getElementById('ewalletType').value = "";
+  document.getElementById('jumlahSaldo').value = "";
+  document.getElementById('topupNumber').value = "";
+}
 
 
 function submitPulsa() {
