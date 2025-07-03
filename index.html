@@ -1072,6 +1072,12 @@ function submitPulsa() {
     console.error(err);
   });
 }
+    function togglePaymentOptions() {
+  const metode = document.getElementById("paymentMethod").value;
+  document.getElementById("codOptions").style.display = metode === "COD" ? "block" : "none";
+  document.getElementById("ewalletOptions").style.display = metode === "E-Wallet" ? "block" : "none";
+}
+
 
 </script>
 
