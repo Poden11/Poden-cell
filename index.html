@@ -702,19 +702,20 @@
     <option value="OVO">OVO</option>
   </select>
 
-  <input type="number" id="jumlahSaldo" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;">
+  <input type="text" id="jumlahSaldo" inputmode="numeric" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;" maxlength="7">
 
-  <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;">
+  <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;" maxlength="14">
 
   <!-- Honeypot anti-bot -->
   <input type="text" id="honey" name="honeytrap" style="display:none;">
 
   <!-- Tombol -->
   <div style="text-align:right; margin-top:10px;">
-    <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px;">✅ Kirim</button>
-    <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">❌ Batal</button>
+    <button onclick="submitTopUp()" style="padding:10px 15px; background:#25D366; color:white; border:none; border-radius:8px; cursor:pointer; transition:all 0.2s ease;">✅ Kirim</button>
+    <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px; cursor:pointer;">❌ Batal</button>
   </div>
 </div>
+
 <div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
   <h3>Form Isi Pulsa</h3>
 
@@ -901,51 +902,57 @@ function submitTopUp() {
   const nama = document.getElementById('topupName').value.trim();
   const ewallet = document.getElementById('ewalletType').value;
   const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
-  const nomorTopup = document.getElementById('topupNumber').value.trim(); // FIX: tambahkan ini
+  const nomorTopup = document.getElementById('topupNumber').value.trim();
   const honey = document.getElementById('honey').value;
 
+  // 💡 Validasi Nama
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
     alert("❌ Nama harus huruf minimal 4 karakter");
     return;
   }
 
+  // 💡 Validasi E-Wallet
   if (!ewallet) {
     alert("❌ Pilih e-wallet terlebih dahulu");
     return;
   }
 
-  if (!jumlahSaldo || isNaN(jumlahSaldo) || parseInt(jumlahSaldo) < 1000) {
+  // 💡 Validasi Saldo
+  const jumlahInt = parseInt(jumlahSaldo.replace(/[^\d]/g, ''));
+  if (isNaN(jumlahInt) || jumlahInt < 1000) {
     alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
     return;
   }
 
+  // 💡 Validasi Nomor
   if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
     alert("❌ Nomor harus valid dan diawali 08");
     return;
   }
 
+  // 🕷️ Anti-bot
   if (honey) {
     alert("❌ Deteksi bot!");
     return;
   }
 
+  // 🕒 Cek Cooldown
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
-  if (lastOrder && now - lastOrder < 30000) {
+  if (lastOrder && now - parseInt(lastOrder) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrder)) / 1000);
     alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
     return;
   }
 
+  // 🚀 Kirim ke Apps Script
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       nama: nama,
       ewallet: ewallet,
-      jumlahSaldo: jumlahSaldo,
+      jumlahSaldo: jumlahInt,
       nomorTopup: nomorTopup,
       jadwalCOD: "COD jam 5 sore",
       paket: `Top Up via ${ewallet}`,
@@ -970,6 +977,7 @@ function submitTopUp() {
     alert("❌ Error saat mengirim");
   });
 }
+
 
 function submitPulsa() {
   const nama = document.getElementById('pulsaName').value.trim();
