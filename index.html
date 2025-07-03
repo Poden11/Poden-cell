@@ -897,6 +897,7 @@ function submitOrder() {
     });
 }
 
+
 let lastOrderTime = localStorage.getItem("lastOrderTime");
 let now = Date.now();
 
@@ -911,38 +912,32 @@ function submitTopUp() {
   submitBtn.disabled = true;
   submitBtn.innerText = "⏳ Mengirim...";
 
-  // ✅ Validasi Nama
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
     alert("❌ Nama harus huruf minimal 4 karakter");
     return resetButton();
   }
 
-  // ✅ Validasi E-Wallet
   if (!ewallet) {
     alert("❌ Pilih e-wallet terlebih dahulu");
     return resetButton();
   }
 
-  // ✅ Validasi Saldo
   const jumlahInt = parseInt(jumlahSaldo.replace(/[^\d]/g, ''));
   if (isNaN(jumlahInt) || jumlahInt < 1000) {
     alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
     return resetButton();
   }
 
-  // ✅ Validasi Nomor
   if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
     alert("❌ Nomor harus valid dan diawali 08");
     return resetButton();
   }
 
-  // ✅ Anti-bot
   if (honey) {
     alert("❌ Deteksi bot!");
     return resetButton();
   }
 
-  // 🕒 Cooldown check
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
   if (lastOrder && now - parseInt(lastOrder) < 30000) {
@@ -951,7 +946,6 @@ function submitTopUp() {
     return resetButton();
   }
 
-  // 🚀 Kirim request
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -1003,6 +997,7 @@ function submitTopUp() {
     document.getElementById('topupNumber').value = "";
   }
 }
+
 
 
 
@@ -1076,5 +1071,6 @@ function submitPulsa() {
     console.error(err);
   });
 }
+
 </script>
 
