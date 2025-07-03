@@ -831,76 +831,76 @@ function tutupForm() {
 }
 
 function submitOrder() {
-    const now = Date.now();
-    const cooldownKey = "lastOrderTime";
-    const lastOrderTime = localStorage.getItem(cooldownKey);
+  const now = Date.now();
+  const cooldownKey = "lastOrderTime";
+  const lastOrderTime = localStorage.getItem(cooldownKey);
 
-    if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
-        const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
-        alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
-        return;
-    }
+  if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
+    const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
+    alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
+    return;
+  }
 
-    const nama = document.getElementById('userName').value;
-    const nomor = document.getElementById('userNumber').value;
-    const metodePembayaran = document.querySelector('input[name="metode"]:checked');
-    const jadwal = metodePembayaran?.value === "COD"
-        ? document.querySelector('input[name="jamCOD"]:checked')?.value || ""
-        : document.querySelector('input[name="eWallet"]:checked')?.value || "";
+  const nama = document.getElementById('userName').value;
+  const nomor = document.getElementById('userNumber').value;
+  const metode = document.getElementById('paymentMethod').value;
+  const jadwal = metode === "COD"
+    ? document.getElementById('jadwalCOD').value
+    : document.getElementById('ewallet').value;
 
-    const honey = document.getElementById('honey')?.value || "";
+  const honey = document.getElementById('honeytrap')?.value || "";
 
-    if (honey) {
-        alert("❌ Deteksi bot!");
-        return;
-    }
+  if (honey) {
+    alert("❌ Deteksi bot!");
+    return;
+  }
 
-    if (nama.length < 4 || !/^[a-zA-Z\s.']{4,50}$/.test(nama)) {
-        alert("❌ Nama wajib huruf, minimal 4 karakter.");
-        return;
-    }
+  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
+    alert("❌ Nama wajib huruf, minimal 4 karakter.");
+    return;
+  }
 
-    if (!/^08[0-9]{8,13}$/.test(nomor)) {
-        alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
-        return;
-    }
+  if (!/^08[0-9]{8,13}$/.test(nomor)) {
+    alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
+    return;
+  }
 
-    localStorage.setItem(cooldownKey, now.toString());
+  if (!jadwal) {
+    alert("❌ Pilih jadwal COD atau jenis E-Wallet");
+    return;
+  }
 
-    fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            nama: nama,
-            nomor: nomor,
-            jadwalCOD: jadwal,
-            paket: paketDipilih,
-            honeytrap: honey,
-            token: "r8i7VnYxZqP4LsKmT2wE", 
-            origin: location.origin              
-        })
+  localStorage.setItem(cooldownKey, now.toString());
+
+  fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      nama,
+      nomor,
+      jadwalCOD: jadwal,
+      paket: paketDipilih,
+      honeytrap: honey,
+      token: "r8i7VnYxZqP4LsKmT2wE",
+      origin: location.origin
     })
-    .then(response => response.text())
-    .then(result => {
-        if (result.includes("Akses ditolak")) {
-            alert("❌ Akses ditolak, bukan dari domain resmi!");
-        } else if (result.includes("Token tidak valid")) {
-            alert("❌ Token salah!");
-        } else if (result.includes("Bot Detected")) {
-            alert("❌ Deteksi bot!");
-        } else {
-            alert("✅ Pesanan berhasil dikirim!");
-            tutupForm();
-        }
-    })
-    .catch(error => {
-        console.error("❌ Error saat kirim pesanan:", error);
-        alert("❌ Gagal kirim pesanan.");
-    });
+  })
+  .then(response => response.text())
+  .then(result => {
+    if (result.includes("success")) {
+      alert("✅ Order berhasil dikirim!");
+      document.getElementById("popupForm").style.display = "none";
+    } else {
+      alert("❌ Gagal: " + result);
+    }
+  })
+  .catch(error => {
+    console.error("❌ Error:", error);
+    alert("❌ Error saat kirim order.");
+  });
 }
-
 
 let lastOrderTime = localStorage.getItem("lastOrderTime");
 let now = Date.now();
