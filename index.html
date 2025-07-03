@@ -693,18 +693,18 @@
 <div id="popupTopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
   <h3 style="margin-top:0;">Top Up Saldo E-Wallet</h3>
 
-  <input type="text" id="topupName" autocomplete="name" placeholder="Nama Lengkap" style="width:100%; padding:10px; margin:10px 0;">
+  <input type="text" id="topupName" placeholder="Nama Lengkap" autocomplete="name" style="width:100%; padding:10px; margin:10px 0;">
 
-  <select id="ewalletType" autocomplete="off" style="width:100%; padding:10px; margin:10px 0;">
+  <select id="ewalletType" style="width:100%; padding:10px; margin:10px 0;" autocomplete="off">
     <option value="">Pilih E-Wallet</option>
     <option value="DANA">DANA</option>
     <option value="GoPay">GoPay</option>
     <option value="OVO">OVO</option>
   </select>
 
-  <input type="number" id="jumlahSaldo" autocomplete="off" placeholder="Jumlah Saldo (cth: 15000)" style="width:100%; padding:10px; margin:10px 0;" min="1000" max="9999999">
+  <input type="text" id="jumlahSaldo" inputmode="numeric" placeholder="Jumlah Saldo (cth: 15000)" autocomplete="off" style="width:100%; padding:10px; margin:10px 0;" maxlength="7">
 
-  <input type="tel" id="topupNumber" autocomplete="tel" placeholder="Nomor Tujuan (08xxxxxxxxxx)" style="width:100%; padding:10px; margin:10px 0;" maxlength="14">
+  <input type="text" id="topupNumber" placeholder="Nomor Tujuan (08xxxxxxxxxx)" autocomplete="tel-national" style="width:100%; padding:10px; margin:10px 0;" maxlength="14">
 
   <!-- Honeypot anti-bot -->
   <input type="text" id="honey" name="honeytrap" style="display:none;">
@@ -715,6 +715,7 @@
     <button onclick="document.getElementById('popupTopup').style.display='none'" style="padding:10px 15px; margin-left:10px; background:#ccc; border:none; border-radius:8px; cursor:pointer;">❌ Batal</button>
   </div>
 </div>
+
 
 
 <div id="popupPulsa" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border-radius:15px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.3); width:90%; max-width:400px;">
@@ -906,55 +907,59 @@ function submitTopUp() {
   const nomorTopup = document.getElementById('topupNumber').value.trim();
   const honey = document.getElementById('honey').value;
 
-  // 💡 Validasi Nama
+  const submitBtn = document.querySelector("#popupTopup button[onclick='submitTopUp()']");
+  submitBtn.disabled = true;
+  submitBtn.innerText = "⏳ Mengirim...";
+
+  // ✅ Validasi Nama
   if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
     alert("❌ Nama harus huruf minimal 4 karakter");
-    return;
+    return resetButton();
   }
 
-  // 💡 Validasi E-Wallet
+  // ✅ Validasi E-Wallet
   if (!ewallet) {
     alert("❌ Pilih e-wallet terlebih dahulu");
-    return;
+    return resetButton();
   }
 
-  // 💡 Validasi Saldo
+  // ✅ Validasi Saldo
   const jumlahInt = parseInt(jumlahSaldo.replace(/[^\d]/g, ''));
   if (isNaN(jumlahInt) || jumlahInt < 1000) {
     alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
-    return;
+    return resetButton();
   }
 
-  // 💡 Validasi Nomor
+  // ✅ Validasi Nomor
   if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
     alert("❌ Nomor harus valid dan diawali 08");
-    return;
+    return resetButton();
   }
 
-  // 🕷️ Anti-bot
+  // ✅ Anti-bot
   if (honey) {
     alert("❌ Deteksi bot!");
-    return;
+    return resetButton();
   }
 
-  // 🕒 Cek Cooldown
+  // 🕒 Cooldown check
   const now = Date.now();
   const lastOrder = localStorage.getItem("lastOrderTime");
   if (lastOrder && now - parseInt(lastOrder) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrder)) / 1000);
     alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
-    return;
+    return resetButton();
   }
 
-  // 🚀 Kirim ke Apps Script
+  // 🚀 Kirim request
   fetch("https://script.google.com/macros/s/AKfycby_q1F0OdUxPOYgO4G9LR_niw_SSzIwAyaKHTThYpCjf8Dpg3JCEoWIhNGiMlm0xGEg/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      nama: nama,
-      ewallet: ewallet,
+      nama,
+      ewallet,
       jumlahSaldo: jumlahInt,
-      nomorTopup: nomorTopup,
+      nomorTopup,
       jadwalCOD: "COD jam 5 sore",
       paket: `Top Up via ${ewallet}`,
       jenisOrder: "topup",
@@ -965,19 +970,40 @@ function submitTopUp() {
   })
   .then(res => res.text())
   .then(result => {
-    if (result.includes("success")) {
-      alert("✅ Top Up berhasil dikirim!");
-      document.getElementById("popupTopup").style.display = "none";
-      localStorage.setItem("lastOrderTime", now);
-    } else {
-      alert("❌ Gagal kirim top up: " + result);
+    try {
+      const json = JSON.parse(result);
+      if (json.status === "success") {
+        alert("✅ Top Up berhasil dikirim!");
+        document.getElementById("popupTopup").style.display = "none";
+        localStorage.setItem("lastOrderTime", now);
+        clearForm();
+      } else {
+        alert("❌ Gagal kirim: " + (json.message || "Unknown error"));
+      }
+    } catch {
+      alert("❌ Respon tidak valid dari server:\n" + result);
     }
+    resetButton();
   })
   .catch(err => {
     console.error(err);
     alert("❌ Error saat mengirim");
+    resetButton();
   });
+
+  function resetButton() {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "✅ Kirim";
+  }
+
+  function clearForm() {
+    document.getElementById('topupName').value = "";
+    document.getElementById('ewalletType').value = "";
+    document.getElementById('jumlahSaldo').value = "";
+    document.getElementById('topupNumber').value = "";
+  }
 }
+
 
 
 function submitPulsa() {
