@@ -822,12 +822,22 @@
 let paketDipilih = '';
 
 function bukaForm(namaPaket) {
-    paketDipilih = namaPaket;
-    document.getElementById('popupForm').style.display = 'block';
+  paketDipilih = namaPaket;
+  document.getElementById('popupForm').style.display = 'block';
+  document.getElementById('paymentMethod').value = "";
+  document.getElementById('jadwalCOD').value = "";
+  document.getElementById('ewallet').value = "";
+  togglePaymentOptions();
 }
 
 function tutupForm() {
-    document.getElementById('popupForm').style.display = 'none';
+  document.getElementById('popupForm').style.display = 'none';
+}
+
+function togglePaymentOptions() {
+  const metode = document.getElementById("paymentMethod").value;
+  document.getElementById("codOptions").style.display = metode === "COD" ? "block" : "none";
+  document.getElementById("ewalletOptions").style.display = metode === "E-Wallet" ? "block" : "none";
 }
 
 function submitOrder() {
@@ -841,42 +851,25 @@ function submitOrder() {
     return;
   }
 
-  const nama = document.getElementById('userName').value;
-  const nomor = document.getElementById('userNumber').value;
+  const nama = document.getElementById('userName').value.trim();
+  const nomor = document.getElementById('userNumber').value.trim();
   const metode = document.getElementById('paymentMethod').value;
   const jadwal = metode === "COD"
     ? document.getElementById('jadwalCOD').value
     : document.getElementById('ewallet').value;
-
   const honey = document.getElementById('honeytrap')?.value || "";
 
-  if (honey) {
-    alert("❌ Deteksi bot!");
-    return;
-  }
-
-  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
-    alert("❌ Nama wajib huruf, minimal 4 karakter.");
-    return;
-  }
-
-  if (!/^08[0-9]{8,13}$/.test(nomor)) {
-    alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
-    return;
-  }
-
-  if (!jadwal) {
-    alert("❌ Pilih jadwal COD atau jenis E-Wallet");
-    return;
-  }
+  if (!metode) return alert("❌ Pilih metode pembayaran dulu.");
+  if (!jadwal) return alert("❌ Pilih jadwal COD atau jenis E-Wallet");
+  if (honey) return alert("❌ Deteksi bot!");
+  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) return alert("❌ Nama wajib huruf, minimal 4 karakter.");
+  if (!/^08[0-9]{8,13}$/.test(nomor)) return alert("❌ Nomor tidak valid. Harus diawali 08 dan cukup panjang.");
 
   localStorage.setItem(cooldownKey, now.toString());
 
   fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       nama,
       nomor,
@@ -887,7 +880,7 @@ function submitOrder() {
       origin: location.origin
     })
   })
-  .then(response => response.text())
+  .then(res => res.text())
   .then(result => {
     if (result.includes("success")) {
       alert("✅ Order berhasil dikirim!");
@@ -896,8 +889,8 @@ function submitOrder() {
       alert("❌ Gagal: " + result);
     }
   })
-  .catch(error => {
-    console.error("❌ Error:", error);
+  .catch(err => {
+    console.error("❌ Error:", err);
     alert("❌ Error saat kirim order.");
   });
 }
@@ -910,97 +903,85 @@ function submitTopUp() {
   const ewallet = document.getElementById('ewalletType').value;
   const jumlahSaldo = document.getElementById('jumlahSaldo').value.trim();
   const nomorTopup = document.getElementById('topupNumber').value.trim();
-  const honey = document.getElementById('honey').value;
-
+  const honey = document.getElementById('honey')?.value || "";
+  const now = Date.now();
+  const lastOrder = localStorage.getItem("lastOrderTime");
   const submitBtn = document.querySelector("#popupTopup button[onclick='submitTopUp()']");
+
+  // Disable tombol selama proses
   submitBtn.disabled = true;
   submitBtn.innerText = "⏳ Mengirim...";
 
-  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
-    alert("❌ Nama harus huruf minimal 4 karakter");
-    return resetButton();
-  }
-
-  if (!ewallet) {
-    alert("❌ Pilih e-wallet terlebih dahulu");
-    return resetButton();
-  }
-
+  // Validasi awal
+  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) return alertGagal("Nama harus huruf minimal 4 karakter");
+  if (!ewallet) return alertGagal("Pilih e-wallet terlebih dahulu");
   const jumlahInt = parseInt(jumlahSaldo.replace(/[^\d]/g, ''));
-  if (isNaN(jumlahInt) || jumlahInt < 1000) {
-    alert("❌ Masukkan jumlah saldo yang valid (minimal 1000)");
-    return resetButton();
-  }
-
-  if (!/^08[0-9]{8,13}$/.test(nomorTopup)) {
-    alert("❌ Nomor harus valid dan diawali 08");
-    return resetButton();
-  }
-
-  if (honey) {
-    alert("❌ Deteksi bot!");
-    return resetButton();
-  }
-
-  const now = Date.now();
-  const lastOrder = localStorage.getItem("lastOrderTime");
+  if (isNaN(jumlahInt) || jumlahInt < 1000) return alertGagal("Jumlah saldo minimal 1000");
+  if (!/^08[0-9]{8,13}$/.test(nomorTopup)) return alertGagal("Nomor harus valid dan diawali 08");
+  if (honey) return alertGagal("Deteksi bot!");
   if (lastOrder && now - parseInt(lastOrder) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrder)) / 1000);
-    alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
-    return resetButton();
+    return alertGagal(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
   }
 
- fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
-  method: "POST",
-  headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  body: new URLSearchParams({
-    nama,
-    ewallet,
-    jumlahSaldo: jumlahInt,
-    nomorTopup,
-    jadwalCOD: "COD jam 5 sore",
-    paket: `Top Up via ${ewallet}`,
-    jenisOrder: "topup",
-    metodeTopup: "COD jam 5 sore",
-    honeytrap: "",
-    token: "r8i7VnYxZqP4LsKmT2wE",
-    origin: location.origin
+  // Kirim ke Google Apps Script
+  fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      nama,
+      ewallet,
+      jumlahSaldo: jumlahInt,
+      nomorTopup,
+      jadwalCOD: "COD jam 5 sore",
+      paket: `Top Up via ${ewallet}`,
+      jenisOrder: "topup",
+      metodeTopup: "COD jam 5 sore",
+      honeytrap: "",
+      token: "r8i7VnYxZqP4LsKmT2wE",
+      origin: location.origin
+    })
   })
-})
-.then(res => res.text())
-.then(result => {
-  try {
-    const json = JSON.parse(result);
-    if (json.status === "success") {
-      alert("✅ Top Up berhasil dikirim!");
-      document.getElementById("popupTopup").style.display = "none";
-      localStorage.setItem("lastOrderTime", now);
-      clearForm();
-    } else {
-      alert("❌ Gagal kirim: " + (json.message || "Unknown error"));
+  .then(res => res.text())
+  .then(result => {
+    try {
+      const json = JSON.parse(result);
+      if (json.status === "success") {
+        alert("✅ Top Up berhasil dikirim!");
+        document.getElementById("popupTopup").style.display = "none";
+        localStorage.setItem("lastOrderTime", now);
+        clearTopupForm();
+      } else {
+        alert("❌ Gagal kirim: " + (json.message || "Unknown error"));
+      }
+    } catch {
+      alert("❌ Respon tidak valid dari server:\n" + result);
     }
-  } catch {
-    alert("❌ Respon tidak valid dari server:\n" + result);
+    resetButton();
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Error saat mengirim");
+    resetButton();
+  });
+
+  function alertGagal(pesan) {
+    alert("❌ " + pesan);
+    resetButton();
   }
-  resetButton();
-})
-.catch(err => {
-  console.error(err);
-  alert("❌ Error saat mengirim");
-  resetButton();
-});
-function resetButton() {
-  submitBtn.disabled = false;
-  submitBtn.innerText = "✅ Kirim";
-}
 
-function clearForm() {
-  document.getElementById('topupName').value = "";
-  document.getElementById('ewalletType').value = "";
-  document.getElementById('jumlahSaldo').value = "";
-  document.getElementById('topupNumber').value = "";
-}
+  function resetButton() {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "✅ Kirim";
+  }
 
+  function clearTopupForm() {
+    document.getElementById('topupName').value = "";
+    document.getElementById('ewalletType').value = "";
+    document.getElementById('jumlahSaldo').value = "";
+    document.getElementById('topupNumber').value = "";
+  }
+}
 
 function submitPulsa() {
   const nama = document.getElementById('pulsaName').value.trim();
@@ -1008,48 +989,34 @@ function submitPulsa() {
   const operator = document.getElementById('pulsaOperator').value;
   const nominal = document.getElementById('pulsaNominal').value.trim();
   const metode = document.querySelector('input[name="pulsaPembayaran"]:checked')?.value;
-
   const now = Date.now();
   const lastOrderTime = localStorage.getItem("lastOrderTime");
 
+  const submitBtn = document.querySelector("#popupPulsa button[onclick='submitPulsa()']");
+  submitBtn.disabled = true;
+  submitBtn.innerText = "⏳ Mengirim...";
+
+  // Validasi semua input
+  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) return alertGagal("Nama wajib huruf minimal 4 karakter");
+  if (!/^08[0-9]{8,13}$/.test(nomor)) return alertGagal("Nomor HP harus valid dan diawali 08");
+  if (!operator) return alertGagal("Pilih operator terlebih dahulu");
+  if (!/^[0-9]{4,7}$/.test(nominal)) return alertGagal("Nominal pulsa harus angka minimal 4 digit (contoh: 10000)");
+  if (!metode) return alertGagal("Pilih metode pembayaran");
+
+  // Cek cooldown
   if (lastOrderTime && now - parseInt(lastOrderTime) < 30000) {
     const sisa = Math.ceil((30000 - (now - lastOrderTime)) / 1000);
-    alert(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
-    return;
+    return alertGagal(`⏳ Tunggu ${sisa} detik lagi sebelum order berikutnya.`);
   }
 
-  if (!nama || nama.length < 4 || !/^[a-zA-Z\s.']+$/.test(nama)) {
-    alert("❌ Nama wajib huruf, minimal 4 karakter.");
-    return;
-  }
-
-  if (!/^08[0-9]{8,13}$/.test(nomor)) {
-    alert("❌ Nomor HP tidak valid (harus diawali 08 dan panjang cukup).");
-    return;
-  }
-
-  if (!operator) {
-    alert("❌ Pilih operator terlebih dahulu.");
-    return;
-  }
-
-  if (!/^[0-9]{4,7}$/.test(nominal)) {
-    alert("❌ Nominal pulsa harus angka dan minimal 4 digit (contoh: 10000)");
-    return;
-  }
-
-  if (!metode) {
-    alert("❌ Pilih metode pembayaran dulu.");
-    return;
-  }
-
+  // Kirim ke Apps Script
   fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      nama: nama,
-      nomor: nomor,
-      operator: operator,
+      nama,
+      nomor,
+      operator,
       nominalPulsa: nominal,
       metodePulsa: metode,
       jenisOrder: "pulsa",
@@ -1059,25 +1026,45 @@ function submitPulsa() {
   })
   .then(res => res.text())
   .then(result => {
-    if (result.includes("success")) {
-      alert("✅ Order pulsa berhasil dikirim!");
-      document.getElementById("popupPulsa").style.display = "none";
-      localStorage.setItem("lastOrderTime", Date.now());
-    } else {
-      alert("❌ Gagal kirim pulsa: " + result);
+    try {
+      const json = JSON.parse(result);
+      if (json.status === "success") {
+        alert("✅ Order pulsa berhasil dikirim!");
+        document.getElementById("popupPulsa").style.display = "none";
+        localStorage.setItem("lastOrderTime", now);
+        clearPulsaForm();
+      } else {
+        alert("❌ Gagal kirim pulsa: " + (json.message || "Unknown error"));
+      }
+    } catch {
+      alert("❌ Respon tidak valid dari server:\n" + result);
     }
+    resetButton();
   })
   .catch(err => {
-    alert("❌ Gagal kirim pulsa");
     console.error(err);
+    alert("❌ Error saat mengirim");
+    resetButton();
   });
-}
-    function togglePaymentOptions() {
-  const metode = document.getElementById("paymentMethod").value;
-  document.getElementById("codOptions").style.display = metode === "COD" ? "block" : "none";
-  document.getElementById("ewalletOptions").style.display = metode === "E-Wallet" ? "block" : "none";
-}
 
+  function alertGagal(pesan) {
+    alert("❌ " + pesan);
+    resetButton();
+  }
 
+  function resetButton() {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "✅ Kirim";
+  }
+
+  function clearPulsaForm() {
+    document.getElementById('pulsaName').value = "";
+    document.getElementById('pulsaNumber').value = "";
+    document.getElementById('pulsaOperator').value = "";
+    document.getElementById('pulsaNominal').value = "";
+    const radio = document.querySelector('input[name="pulsaPembayaran"]:checked');
+    if (radio) radio.checked = false;
+  }
+}
 </script>
 
