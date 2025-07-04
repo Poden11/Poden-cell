@@ -751,40 +751,18 @@
 
 
 
-   <form id="orderFormKuota" action="https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec" method="POST" style="display:none;">
-  <input type="hidden" name="jenisOrder" value="kuota">
-  <input type="hidden" name="nama" id="formNamaKuota">
-  <input type="hidden" name="nomor" id="formNomorKuota">
-  <input type="hidden" name="jadwalCOD" id="formJadwalKuota">
-  <input type="hidden" name="paket" id="formPaketKuota">
-  <input type="hidden" name="token" id="formTokenKuota">
-  <input type="hidden" name="origin" value="https://poden11.github.io">
-</form>
-
-
-    <form id="orderFormPulsa" action="https://script.google.com/macros/s/AKfycbzCQbjDZqTr1I-WBaghdZ0oxTOqLOC9PEp03i2QHc3R68WDlc4g0G1-dOg5bHDySmj3ZA/exec" method="POST" style="display:none;">
-  <input type="hidden" name="jenisOrder" value="pulsa">
-  <input type="hidden" name="nama" id="formNamaPulsa">
-  <input type="hidden" name="nomor" id="formNomorPulsa">
-  <input type="hidden" name="operator" id="formOperatorPulsa">
-  <input type="hidden" name="nominalPulsa" id="formNominalPulsa">
-  <input type="hidden" name="metodePulsa" id="formMetodePulsa">
-  <input type="hidden" name="token" id="formTokenPulsa">
-  <input type="hidden" name="origin" value="https://poden11.github.io">
-</form>
-
-    <form id="orderFormTopUp" action="https://script.google.com/macros/s/AKfycbw6zOOMT6234bUUzVWKdXac8SOlQjWREOzMVxfwvr1NwCHUdS3QzocOexlFqHjFDv46/exec" method="POST" style="display:none;">
-  <input type="hidden" name="jenisOrder" value="topup">
-  <input type="hidden" name="nama" id="formNamaTopUp">
-  <input type="hidden" name="ewallet" id="formEwalletTopUp">
-  <input type="hidden" name="jumlahSaldo" id="formJumlahSaldoTopUp">
+    <form id="orderForm" action="https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec" method="POST" style="display:none;">
+  <input type="hidden" name="nama" id="formNama">
+  <input type="hidden" name="ewallet" id="formEwallet">
+  <input type="hidden" name="jumlahSaldo" id="formJumlahSaldo">
   <input type="hidden" name="nomorTopup" id="formNomorTopup">
-  <input type="hidden" name="metodeTopup" id="formMetodeTopUp">
-  <input type="hidden" name="token" id="formTokenTopUp">
+  <input type="hidden" name="metodeTopup" id="formMetodeTopup">
+  <input type="hidden" name="jadwalCOD" id="formJadwal">
+  <input type="hidden" name="paket" id="formPaket">
+  <input type="hidden" name="jenisOrder" id="formJenisOrder">
+  <input type="hidden" name="token" id="formToken">
   <input type="hidden" name="origin" value="https://poden11.github.io">
 </form>
-
-
 
    <section class="payment-methods">
     <div class="container">
@@ -947,7 +925,7 @@ function submitTopUp() {
   }
 
   // Kirim ke Google Apps Script
-  fetch("https://script.google.com/macros/s/AKfycbzCQbjDZqTr1I-WBaghdZ0oxTOqLOC9PEp03i2QHc3R68WDlc4g0G1-dOg5bHDySmj3ZA/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -1032,7 +1010,7 @@ function submitPulsa() {
   }
 
   // Kirim ke Apps Script
-  fetch("https://script.google.com/macros/s/AKfycbw6zOOMT6234bUUzVWKdXac8SOlQjWREOzMVxfwvr1NwCHUdS3QzocOexlFqHjFDv46/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwRbgmy8tryf9_UFnzIx0cu6wxmUYErUpbV_roJRq8TIhvLxxP_BfjFqXHGqSREU2yV/exec", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -1089,4 +1067,3 @@ function submitPulsa() {
   }
 }
 </script>
-
